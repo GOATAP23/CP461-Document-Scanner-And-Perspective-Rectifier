@@ -364,20 +364,41 @@ TRANSLATIONS = {
 }
 
 
+# Initialize language in session state (default: Thai)
+if "language" not in st.session_state:
+    st.session_state["language"] = "th"
+
+
 # ─────────────────────────────────────────────────────────
 # Sidebar Controls
 # ─────────────────────────────────────────────────────────
 with st.sidebar:
-    # Language Selector
-    lang_code = st.selectbox(
-        "🌐 ภาษา / Language",
-        ["th", "en"],
-        index=0,
-        format_func=lambda x: "🇹🇭 ภาษาไทย" if x == "th" else "🇬🇧 English",
-        key="selected_language",
-    )
+    # Language Switch Buttons
+    st.markdown("### 🌐 เลือกภาษา / Language")
+    lang_col1, lang_col2 = st.columns(2)
+    with lang_col1:
+        if st.button(
+            "🇹🇭 ภาษาไทย",
+            use_container_width=True,
+            type="primary" if st.session_state["language"] == "th" else "secondary",
+            key="btn_lang_th_side",
+        ):
+            st.session_state["language"] = "th"
+            st.rerun()
+    with lang_col2:
+        if st.button(
+            "🇬🇧 English",
+            use_container_width=True,
+            type="primary" if st.session_state["language"] == "en" else "secondary",
+            key="btn_lang_en_side",
+        ):
+            st.session_state["language"] = "en"
+            st.rerun()
+
+    lang_code = st.session_state["language"]
     t = TRANSLATIONS[lang_code]
 
+    st.markdown("---")
     st.markdown(f"## {t['settings_title']}")
     st.markdown("---")
 
@@ -438,6 +459,29 @@ with st.sidebar:
 # ─────────────────────────────────────────────────────────
 # Main Content
 # ─────────────────────────────────────────────────────────
+
+# Top Language Switcher Bar on Main Page
+top_col1, top_col2 = st.columns([3.5, 1.5])
+with top_col2:
+    t_c1, t_c2 = st.columns(2)
+    with t_c1:
+        if st.button(
+            "🇹🇭 ไทย",
+            use_container_width=True,
+            type="primary" if st.session_state["language"] == "th" else "secondary",
+            key="btn_lang_th_top",
+        ):
+            st.session_state["language"] = "th"
+            st.rerun()
+    with t_c2:
+        if st.button(
+            "🇬🇧 EN",
+            use_container_width=True,
+            type="primary" if st.session_state["language"] == "en" else "secondary",
+            key="btn_lang_en_top",
+        ):
+            st.session_state["language"] = "en"
+            st.rerun()
 
 # Header
 st.markdown(f"""
