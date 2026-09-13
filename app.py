@@ -208,57 +208,217 @@ def format_homography_html(H: np.ndarray) -> str:
 
 
 # ─────────────────────────────────────────────────────────
-# Sidebar Controls
+# Internationalization (i18n) / ระบบสลับภาษา
 # ─────────────────────────────────────────────────────────
-with st.sidebar:
-    st.markdown("## ⚙️ Scanner Settings")
-    st.markdown("---")
-
-    # Detection settings
-    st.markdown("### 🔍 Detection")
-    feature_method = st.selectbox(
-        "Feature Detection Method",
-        ["SIFT", "ORB"],
-        index=0,
-        help="SIFT is more accurate but slower. ORB is faster but less robust.",
-    )
-
-    use_a4 = st.checkbox("Enforce A4 Ratio (1:√2)", value=True)
-
-    st.markdown("---")
-
-    # Preprocessing settings
-    st.markdown("### 🖼️ Preprocessing")
-    canny_low = st.slider("Canny Low Threshold", 10, 150, 50, step=5)
-    canny_high = st.slider("Canny High Threshold", 100, 400, 200, step=10)
-    blur_kernel = st.slider("Blur Kernel Size", 3, 15, 5, step=2)
-    use_bilateral = st.checkbox("Use Bilateral Filter", value=False)
-
-    st.markdown("---")
-
-    # Enhancement settings
-    st.markdown("### ✨ Enhancement")
-    enhancement_mode = st.selectbox(
-        "Output Filter",
-        ["original", "grayscale", "magic_color", "bw_scanner", "shadow_removal", "contrast_enhanced"],
-        index=0,
-        format_func=lambda x: {
+TRANSLATIONS = {
+    "en": {
+        "page_title": "Document Scanner | Auto Perspective Rectifier",
+        "header_title": "📄 Automatic Document Scanner",
+        "header_subtitle": "Perspective Rectifier with SIFT/ORB Feature Matching, Homography & RANSAC",
+        "lang_select": "🌐 Language / ภาษา",
+        "settings_title": "⚙️ Scanner Settings",
+        "detection_title": "🔍 Detection",
+        "feature_method_label": "Feature Detection Method",
+        "feature_method_help": "SIFT is more accurate but slower. ORB is faster but less robust.",
+        "enforce_a4_label": "Enforce A4 Ratio (1:√2)",
+        "preprocessing_title": "🖼️ Preprocessing",
+        "canny_low_label": "Canny Low Threshold",
+        "canny_high_label": "Canny High Threshold",
+        "blur_kernel_label": "Blur Kernel Size",
+        "bilateral_label": "Use Bilateral Filter",
+        "enhancement_title": "✨ Enhancement",
+        "output_filter_label": "Output Filter",
+        "bw_options_title": "B&W Scanner Options",
+        "block_size_label": "Block Size",
+        "c_value_label": "C Value",
+        "thresh_method_label": "Threshold Method",
+        "footer_text": "CP461 — Computer Vision<br>Document Scanner v1.0",
+        "uploader_label": "Upload a document image",
+        "uploader_help": "Drag and drop or click to upload a photo of a document (JPG, PNG, BMP, TIFF, WebP).",
+        "error_title": "❌ Error",
+        "error_load_msg": "Could not load the uploaded image. Please try a different file.",
+        "scanning_msg": "🔄 Scanning document...",
+        "scan_complete_title": "✅ Scan Complete",
+        "scan_issue_title": "⚠️ Scan Issue",
+        "stat_detection": "Detection Method",
+        "stat_keypoints": "Keypoints Detected",
+        "stat_size": "Document Size (px)",
+        "stat_feature": "Feature Method",
+        "results_title": "📊 Results Comparison",
+        "img_original": "📷 Original",
+        "img_rectified": "🔄 Rectified (Warped)",
+        "download_btn": "⬇️ Download Scanned Document",
+        "pipeline_expander": "🔬 Pipeline Visualization — Step by Step",
+        "step1_title": "Step 1: Preprocessing",
+        "step1_gray": "Grayscale",
+        "step1_blurred": "Blurred",
+        "step1_edges": "Canny Edges",
+        "step2_title": "Step 2: Corner Detection",
+        "step2_dilated": "Dilated Edges",
+        "step2_corners": "Detected Corners",
+        "step2_coords": "Corner Coordinates:",
+        "corner_tl": "Top-Left",
+        "corner_tr": "Top-Right",
+        "corner_br": "Bottom-Right",
+        "corner_bl": "Bottom-Left",
+        "step3_title": "Step 3: Feature Detection (Keypoints)",
+        "step3_info": "Detected **{count}** keypoints using **{method}**",
+        "step4_title": "Step 4: Homography Matrix",
+        "filters_expander": "🎨 All Enhancement Filters Preview",
+        "summary_expander": "📋 Pipeline Summary",
+        "welcome_title": "👋 Welcome to the Document Scanner!",
+        "welcome_desc": "Upload a photo of a document to get started. The scanner will automatically:",
+        "step_detect_title": "Detect Edges",
+        "step_detect_desc": "Find document boundaries using Canny Edge Detection",
+        "step_corner_title": "Find Corners",
+        "step_corner_desc": "Locate the 4 corners of your document",
+        "step_rectify_title": "Rectify",
+        "step_rectify_desc": "Warp perspective to a standard A4 ratio",
+        "step_enhance_title": "Enhance",
+        "step_enhance_desc": "Apply filters for a clean scan output",
+        "landing_footer": "CP461 Introduction to Computer Vision — Automatic Document Scanner & Perspective Rectifier<br>Powered by OpenCV • SIFT/ORB • Homography • RANSAC",
+        "filter_names": {
             "original": "📷 Original (No Filter)",
             "grayscale": "🔲 Grayscale",
             "magic_color": "🌈 Magic Color",
             "bw_scanner": "📝 B&W Scanner",
             "shadow_removal": "☀️ Shadow Removal",
             "contrast_enhanced": "🔆 Contrast Enhanced (CLAHE)",
-        }.get(x, x),
+        },
+    },
+    "th": {
+        "page_title": "ระบบสแกนและปรับมุมมองเอกสารอัตโนมัติ | Document Scanner",
+        "header_title": "📄 ระบบสแกนเอกสารและปรับมุมมองภาพอัตโนมัติ",
+        "header_subtitle": "ปรับระนาบหน้าตรงด้วย SIFT/ORB Feature Matching, เมทริกซ์ Homography และ RANSAC",
+        "lang_select": "🌐 ภาษา / Language",
+        "settings_title": "⚙️ การตั้งค่าระบบ (Settings)",
+        "detection_title": "🔍 การตรวจจับขอบเขต (Detection)",
+        "feature_method_label": "อัลกอริทึมสกัดจุดเด่น (Feature Method)",
+        "feature_method_help": "SIFT ให้ความแม่นยำสูงกว่าในมุมเอียงมาก ส่วน ORB ประมวลผลได้รวดเร็วกว่า",
+        "enforce_a4_label": "บังคับสัดส่วน A4 (1:√2)",
+        "preprocessing_title": "🖼️ การปรับแต่งก่อนประมวลผล (Preprocessing)",
+        "canny_low_label": "Canny Low Threshold",
+        "canny_high_label": "Canny High Threshold",
+        "blur_kernel_label": "ขนาด Blur Kernel",
+        "bilateral_label": "ใช้ Bilateral Filter (ลด Noise คงขอบภาพ)",
+        "enhancement_title": "✨ ฟิลเตอร์ปรับปรุงภาพ (Enhancement)",
+        "output_filter_label": "เลือกฟิลเตอร์ผลลัพธ์",
+        "bw_options_title": "ตัวเลือก B&W Scanner",
+        "block_size_label": "Block Size (ขนาดพื้นที่รอบจุด)",
+        "c_value_label": "C Value (ค่าชดเชยแสง)",
+        "thresh_method_label": "วิธีคำนวณ Threshold",
+        "footer_text": "CP461 — Computer Vision<br>Document Scanner v1.0",
+        "uploader_label": "อัปโหลดภาพถ่ายเอกสาร",
+        "uploader_help": "ลากไฟล์มาวาง หรือคลิกเพื่อเลือกภาพเอกสาร (รองรับ JPG, PNG, BMP, TIFF, WebP)",
+        "error_title": "❌ ข้อผิดพลาด",
+        "error_load_msg": "ไม่สามารถโหลดภาพที่อัปโหลดได้ กรุณาลองใช้ไฟล์อื่น",
+        "scanning_msg": "🔄 กำลังสแกนและประมวลผลภาพเอกสาร...",
+        "scan_complete_title": "✅ สแกนสำเร็จ",
+        "scan_issue_title": "⚠️ พบข้อจำกัดในการสแกน",
+        "stat_detection": "วิธีตรวจจับขอบ",
+        "stat_keypoints": "Keypoints ที่ตรวจพบ",
+        "stat_size": "ขนาดเอกสาร (พิกเซล)",
+        "stat_feature": "โมเดล Feature",
+        "results_title": "📊 เปรียบเทียบผลลัพธ์ภาพ",
+        "img_original": "📷 ภาพต้นฉบับ (Original)",
+        "img_rectified": "🔄 ปรับมุมระนาบตรง (Rectified)",
+        "download_btn": "⬇️ ดาวน์โหลดภาพสแกนเอกสาร (PNG)",
+        "pipeline_expander": "🔬 ขั้นตอนการทำงานของ Pipeline ทีละสเต็ป",
+        "step1_title": "สเต็ป 1: การประมวลผลเบื้องต้น (Preprocessing)",
+        "step1_gray": "ภาพเฉดสีเทา (Grayscale)",
+        "step1_blurred": "ภาพเบลอลด Noise (Blurred)",
+        "step1_edges": "เส้นขอบ Canny Edges",
+        "step2_title": "สเต็ป 2: ตรวจจับมุมเอกสารทั้ง 4 (Corner Detection)",
+        "step2_dilated": "ขยายเส้นขอบ (Dilated Edges)",
+        "step2_corners": "ตำแหน่งมุมทั้ง 4 (Detected Corners)",
+        "step2_coords": "พิกัดของมุมทั้ง 4 (Corner Coordinates):",
+        "corner_tl": "บน-ซ้าย (Top-Left)",
+        "corner_tr": "บน-ขวา (Top-Right)",
+        "corner_br": "ล่าง-ขวา (Bottom-Right)",
+        "corner_bl": "ล่าง-ซ้าย (Bottom-Left)",
+        "step3_title": "สเต็ป 3: จุดเด่นภาพ (Feature Keypoints)",
+        "step3_info": "ตรวจพบ Keypoints ทั้งหมด **{count}** จุด ด้วยอัลกอริทึม **{method}**",
+        "step4_title": "สเต็ป 4: เมทริกซ์การแปลงพิกัด (Homography Matrix)",
+        "filters_expander": "🎨 แสดงตัวอย่างผลลัพธ์ทุกฟิลเตอร์แต่งภาพ",
+        "summary_expander": "📋 สรุปข้อมูล Pipeline Summary",
+        "welcome_title": "👋 ยินดีต้อนรับสู่ระบบสแกนเอกสารอัตโนมัติ!",
+        "welcome_desc": "อัปโหลดภาพถ่ายเอกสารเพื่อเริ่มต้นใช้งาน ระบบจะประมวลผลอัตโนมัติตามขั้นตอน:",
+        "step_detect_title": "ตรวจจับขอบกระดาษ",
+        "step_detect_desc": "ค้นหาขอบเขตของเอกสารด้วย Canny Edge Detection",
+        "step_corner_title": "ค้นหามุมทั้ง 4",
+        "step_corner_desc": "คำนวณตำแหน่ง 4 มุมของเอกสารด้วย Contour Polygon",
+        "step_rectify_title": "ดัดมุมระนาบตรง",
+        "step_rectify_desc": "แก้ไขมุมเอียง Perspective Warping สู่สัดส่วนมาตรฐาน A4",
+        "step_enhance_title": "ปรับแต่งคุณภาพภาพ",
+        "step_enhance_desc": "ตกแต่งให้อ่านง่าย คมชัด ลบเงา และเร่งสีสัน",
+        "landing_footer": "CP461 Introduction to Computer Vision — Automatic Document Scanner & Perspective Rectifier<br>พัฒนาด้วย OpenCV • SIFT/ORB • Homography • RANSAC",
+        "filter_names": {
+            "original": "📷 ภาพต้นฉบับ (Original)",
+            "grayscale": "🔲 ขาวดำเกรย์สเกล (Grayscale)",
+            "magic_color": "🌈 เร่งสีสันสดใส (Magic Color)",
+            "bw_scanner": "📝 สแกนขาว-ดำ คมชัด (B&W Scanner)",
+            "shadow_removal": "☀️ ลบเงาตกกระทบ (Shadow Removal)",
+            "contrast_enhanced": "🔆 เพิ่มคอนทราสต์ (CLAHE)",
+        },
+    },
+}
+
+
+# ─────────────────────────────────────────────────────────
+# Sidebar Controls
+# ─────────────────────────────────────────────────────────
+with st.sidebar:
+    # Language Selector
+    lang_code = st.selectbox(
+        "🌐 ภาษา / Language",
+        ["th", "en"],
+        index=0,
+        format_func=lambda x: "🇹🇭 ภาษาไทย" if x == "th" else "🇬🇧 English",
+        key="selected_language",
+    )
+    t = TRANSLATIONS[lang_code]
+
+    st.markdown(f"## {t['settings_title']}")
+    st.markdown("---")
+
+    # Detection settings
+    st.markdown(f"### {t['detection_title']}")
+    feature_method = st.selectbox(
+        t["feature_method_label"],
+        ["SIFT", "ORB"],
+        index=0,
+        help=t["feature_method_help"],
+    )
+
+    use_a4 = st.checkbox(t["enforce_a4_label"], value=True)
+
+    st.markdown("---")
+
+    # Preprocessing settings
+    st.markdown(f"### {t['preprocessing_title']}")
+    canny_low = st.slider(t["canny_low_label"], 10, 150, 50, step=5)
+    canny_high = st.slider(t["canny_high_label"], 100, 400, 200, step=10)
+    blur_kernel = st.slider(t["blur_kernel_label"], 3, 15, 5, step=2)
+    use_bilateral = st.checkbox(t["bilateral_label"], value=False)
+
+    st.markdown("---")
+
+    # Enhancement settings
+    st.markdown(f"### {t['enhancement_title']}")
+    enhancement_mode = st.selectbox(
+        t["output_filter_label"],
+        ["original", "grayscale", "magic_color", "bw_scanner", "shadow_removal", "contrast_enhanced"],
+        index=0,
+        format_func=lambda x: t["filter_names"].get(x, x),
     )
 
     # B&W Scanner specific settings
     if enhancement_mode == "bw_scanner":
-        st.markdown("#### B&W Scanner Options")
-        block_size = st.slider("Block Size", 3, 51, 21, step=2)
-        c_value = st.slider("C Value", 1, 30, 10)
+        st.markdown(f"#### {t['bw_options_title']}")
+        block_size = st.slider(t["block_size_label"], 3, 51, 21, step=2)
+        c_value = st.slider(t["c_value_label"], 1, 30, 10)
         thresh_method = st.selectbox(
-            "Threshold Method",
+            t["thresh_method_label"],
             ["gaussian", "mean"],
             format_func=lambda x: x.capitalize(),
         )
@@ -269,8 +429,8 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown(
-        "<p style='text-align:center; color:#718096; font-size:0.75rem;'>"
-        "CP461 — Computer Vision<br>Document Scanner v1.0</p>",
+        f"<p style='text-align:center; color:#718096; font-size:0.75rem;'>"
+        f"{t['footer_text']}</p>",
         unsafe_allow_html=True,
     )
 
@@ -280,18 +440,18 @@ with st.sidebar:
 # ─────────────────────────────────────────────────────────
 
 # Header
-st.markdown("""
+st.markdown(f"""
 <div class="main-header">
-    <h1>📄 Automatic Document Scanner</h1>
-    <p>Perspective Rectifier with SIFT/ORB Feature Matching, Homography & RANSAC</p>
+    <h1>{t['header_title']}</h1>
+    <p>{t['header_subtitle']}</p>
 </div>
 """, unsafe_allow_html=True)
 
 # File Upload
 uploaded_file = st.file_uploader(
-    "Upload a document image",
+    t["uploader_label"],
     type=["jpg", "jpeg", "png", "bmp", "tiff", "webp"],
-    help="Drag and drop or click to upload a photo of a document.",
+    help=t["uploader_help"],
     key="doc_upload",
 )
 
@@ -301,8 +461,8 @@ if uploaded_file is not None:
 
     if image is None:
         st.markdown(
-            '<div class="info-card error-card"><h4>❌ Error</h4>'
-            '<p>Could not load the uploaded image. Please try a different file.</p></div>',
+            f'<div class="info-card error-card"><h4>{t["error_title"]}</h4>'
+            f'<p>{t["error_load_msg"]}</p></div>',
             unsafe_allow_html=True,
         )
     else:
@@ -321,19 +481,19 @@ if uploaded_file is not None:
         )
 
         # Run pipeline
-        with st.spinner("🔄 Scanning document..."):
+        with st.spinner(t["scanning_msg"]):
             result = scanner.scan(image)
 
         # Status message
         if result["success"]:
             st.markdown(
-                f'<div class="info-card success-card"><h4>✅ Scan Complete</h4>'
+                f'<div class="info-card success-card"><h4>{t["scan_complete_title"]}</h4>'
                 f'<p>{result["message"]}</p></div>',
                 unsafe_allow_html=True,
             )
         else:
             st.markdown(
-                f'<div class="info-card error-card"><h4>⚠️ Scan Issue</h4>'
+                f'<div class="info-card error-card"><h4>{t["scan_issue_title"]}</h4>'
                 f'<p>{result["message"]}</p></div>',
                 unsafe_allow_html=True,
             )
@@ -345,14 +505,14 @@ if uploaded_file is not None:
                 st.markdown(
                     f'<div class="stat-box"><div class="stat-value">'
                     f'{result.get("detection_method", "N/A").split(":")[0]}</div>'
-                    f'<div class="stat-label">Detection Method</div></div>',
+                    f'<div class="stat-label">{t["stat_detection"]}</div></div>',
                     unsafe_allow_html=True,
                 )
             with stats_cols[1]:
                 st.markdown(
                     f'<div class="stat-box"><div class="stat-value">'
                     f'{result.get("num_keypoints", 0)}</div>'
-                    f'<div class="stat-label">Keypoints Detected</div></div>',
+                    f'<div class="stat-label">{t["stat_keypoints"]}</div></div>',
                     unsafe_allow_html=True,
                 )
             with stats_cols[2]:
@@ -361,50 +521,42 @@ if uploaded_file is not None:
                     st.markdown(
                         f'<div class="stat-box"><div class="stat-value">'
                         f'{w:.0f}×{h:.0f}</div>'
-                        f'<div class="stat-label">Document Size (px)</div></div>',
+                        f'<div class="stat-label">{t["stat_size"]}</div></div>',
                         unsafe_allow_html=True,
                     )
             with stats_cols[3]:
                 st.markdown(
                     f'<div class="stat-box"><div class="stat-value">'
                     f'{feature_method}</div>'
-                    f'<div class="stat-label">Feature Method</div></div>',
+                    f'<div class="stat-label">{t["stat_feature"]}</div></div>',
                     unsafe_allow_html=True,
                 )
 
         # ─── Main Comparison: Original vs Rectified vs Enhanced ───
         if result["success"]:
             st.markdown(
-                '<div class="section-header"><h3>📊 Results Comparison</h3></div>',
+                f'<div class="section-header"><h3>{t["results_title"]}</h3></div>',
                 unsafe_allow_html=True,
             )
 
             comp_cols = st.columns(3)
             with comp_cols[0]:
-                st.markdown("**📷 Original**")
+                st.markdown(f"**{t['img_original']}**")
                 st.image(cv2_to_pil(image), use_container_width=True)
 
             with comp_cols[1]:
-                st.markdown("**🔄 Rectified (Warped)**")
+                st.markdown(f"**{t['img_rectified']}**")
                 st.image(cv2_to_pil(result["warped"]), use_container_width=True)
 
             with comp_cols[2]:
-                mode_labels = {
-                    "original": "📷 Original",
-                    "grayscale": "🔲 Grayscale",
-                    "magic_color": "🌈 Magic Color",
-                    "bw_scanner": "📝 B&W Scanner",
-                    "shadow_removal": "☀️ Shadow Removal",
-                    "contrast_enhanced": "🔆 CLAHE",
-                }
-                label = mode_labels.get(enhancement_mode, enhancement_mode)
+                label = t["filter_names"].get(enhancement_mode, enhancement_mode)
                 st.markdown(f"**{label}**")
                 st.image(cv2_to_pil(result["enhanced"]), use_container_width=True)
 
             # ─── Download Button ───
             download_bytes = image_to_bytes(result["enhanced"])
             st.download_button(
-                label="⬇️ Download Scanned Document",
+                label=t["download_btn"],
                 data=download_bytes,
                 file_name="scanned_document.png",
                 mime="image/png",
@@ -413,63 +565,56 @@ if uploaded_file is not None:
 
         # ─── Pipeline Visualization ───
         if result["success"]:
-            with st.expander("🔬 Pipeline Visualization — Step by Step", expanded=False):
+            with st.expander(t["pipeline_expander"], expanded=False):
 
-                st.markdown("#### Step 1: Preprocessing")
+                st.markdown(f"#### {t['step1_title']}")
                 prep_cols = st.columns(3)
                 with prep_cols[0]:
-                    st.markdown("**Grayscale**")
+                    st.markdown(f"**{t['step1_gray']}**")
                     st.image(result["preprocessed"]["gray"], use_container_width=True)
                 with prep_cols[1]:
-                    st.markdown("**Blurred**")
+                    st.markdown(f"**{t['step1_blurred']}**")
                     st.image(result["preprocessed"]["blurred"], use_container_width=True)
                 with prep_cols[2]:
-                    st.markdown("**Canny Edges**")
+                    st.markdown(f"**{t['step1_edges']}**")
                     st.image(result["preprocessed"]["edges"], use_container_width=True)
 
                 st.markdown("---")
-                st.markdown("#### Step 2: Corner Detection")
+                st.markdown(f"#### {t['step2_title']}")
                 corner_cols = st.columns(2)
                 with corner_cols[0]:
-                    st.markdown("**Dilated Edges**")
+                    st.markdown(f"**{t['step2_dilated']}**")
                     st.image(result["preprocessed"]["edges_dilated"], use_container_width=True)
                 with corner_cols[1]:
-                    st.markdown("**Detected Corners**")
+                    st.markdown(f"**{t['step2_corners']}**")
                     st.image(cv2_to_pil(result["corners_visualization"]), use_container_width=True)
 
-                st.markdown("**Corner Coordinates:**")
+                st.markdown(f"**{t['step2_coords']}**")
                 corners = result["corners"]
-                labels = ["Top-Left", "Top-Right", "Bottom-Right", "Bottom-Left"]
+                labels = [t["corner_tl"], t["corner_tr"], t["corner_br"], t["corner_bl"]]
+                corner_col_name = "มุม (Corner)" if lang_code == "th" else "Corner"
                 corner_data = {
-                    "Corner": labels,
+                    corner_col_name: labels,
                     "X": [f"{c[0]:.1f}" for c in corners],
                     "Y": [f"{c[1]:.1f}" for c in corners],
                 }
                 st.table(corner_data)
 
                 st.markdown("---")
-                st.markdown("#### Step 3: Feature Detection (Keypoints)")
+                st.markdown(f"#### {t['step3_title']}")
                 st.image(cv2_to_pil(result["feature_keypoints"]), use_container_width=True)
-                st.info(f"Detected **{result.get('num_keypoints', 0)}** keypoints using **{feature_method}**")
+                st.info(t["step3_info"].format(count=result.get("num_keypoints", 0), method=feature_method))
 
                 st.markdown("---")
-                st.markdown("#### Step 4: Homography Matrix")
+                st.markdown(f"#### {t['step4_title']}")
                 if result.get("homography") is not None:
                     st.markdown(format_homography_html(result["homography"]), unsafe_allow_html=True)
                     st.latex(r"P_{\text{target}} = H \cdot P_{\text{source}}")
 
         # ─── All Filters Preview ───
         if result["success"] and result.get("all_filters"):
-            with st.expander("🎨 All Enhancement Filters Preview", expanded=False):
+            with st.expander(t["filters_expander"], expanded=False):
                 filters = result["all_filters"]
-                filter_names = {
-                    "original": "📷 Original",
-                    "grayscale": "🔲 Grayscale",
-                    "magic_color": "🌈 Magic Color",
-                    "bw_scanner": "📝 B&W Scanner",
-                    "shadow_removal": "☀️ Shadow Removal",
-                    "contrast_enhanced": "🔆 CLAHE",
-                }
 
                 # Display in 3-column grid
                 filter_keys = list(filters.keys())
@@ -480,30 +625,31 @@ if uploaded_file is not None:
                         if idx < len(filter_keys):
                             key = filter_keys[idx]
                             with col:
-                                st.markdown(f"**{filter_names.get(key, key)}**")
+                                filter_display = t["filter_names"].get(key, key)
+                                st.markdown(f"**{filter_display}**")
                                 st.image(cv2_to_pil(filters[key]), use_container_width=True)
 
         # ─── Pipeline Summary ───
         if result["success"]:
-            with st.expander("📋 Pipeline Summary", expanded=False):
+            with st.expander(t["summary_expander"], expanded=False):
                 summary = scanner.get_pipeline_summary(result)
                 st.code(summary, language="text")
 
 else:
     # Landing state — show instructions
-    st.markdown("""
+    st.markdown(f"""
     <div class="info-card">
-        <h4>👋 Welcome to the Document Scanner!</h4>
-        <p>Upload a photo of a document to get started. The scanner will automatically:</p>
+        <h4>{t['welcome_title']}</h4>
+        <p>{t['welcome_desc']}</p>
     </div>
     """, unsafe_allow_html=True)
 
     step_cols = st.columns(4)
     steps = [
-        ("🔍", "Detect Edges", "Find document boundaries using Canny Edge Detection"),
-        ("📐", "Find Corners", "Locate the 4 corners of your document"),
-        ("🔄", "Rectify", "Warp perspective to a standard A4 ratio"),
-        ("✨", "Enhance", "Apply filters for a clean scan output"),
+        ("🔍", t["step_detect_title"], t["step_detect_desc"]),
+        ("📐", t["step_corner_title"], t["step_corner_desc"]),
+        ("🔄", t["step_rectify_title"], t["step_rectify_desc"]),
+        ("✨", t["step_enhance_title"], t["step_enhance_desc"]),
     ]
     for col, (icon, title, desc) in zip(step_cols, steps):
         with col:
@@ -515,8 +661,8 @@ else:
 
     st.markdown("---")
     st.markdown(
-        '<p style="text-align:center; color:#a0aec0; font-size:0.85rem;">'
-        'CP461 Introduction to Computer Vision — Automatic Document Scanner & Perspective Rectifier<br>'
-        'Powered by OpenCV • SIFT/ORB • Homography • RANSAC</p>',
+        f'<p style="text-align:center; color:#a0aec0; font-size:0.85rem;">'
+        f'{t["landing_footer"]}</p>',
         unsafe_allow_html=True,
     )
+
