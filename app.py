@@ -215,7 +215,7 @@ TRANSLATIONS = {
         "page_title": "Document Scanner | Auto Perspective Rectifier",
         "header_title": "📄 Automatic Document Scanner",
         "header_subtitle": "Perspective Rectifier with SIFT/ORB Feature Matching, Homography & RANSAC",
-        "lang_select": "🌐 Language / ภาษา",
+        "lang_select": "🌐 Select Language",
         "settings_title": "⚙️ Scanner Settings",
         "detection_title": "🔍 Detection",
         "feature_method_label": "Feature Detection Method",
@@ -290,7 +290,7 @@ TRANSLATIONS = {
         "page_title": "ระบบสแกนและปรับมุมมองเอกสารอัตโนมัติ | Document Scanner",
         "header_title": "📄 ระบบสแกนเอกสารและปรับมุมมองภาพอัตโนมัติ",
         "header_subtitle": "ปรับระนาบหน้าตรงด้วย SIFT/ORB Feature Matching, เมทริกซ์ Homography และ RANSAC",
-        "lang_select": "🌐 ภาษา / Language",
+        "lang_select": "🌐 เลือกภาษา",
         "settings_title": "⚙️ การตั้งค่าระบบ (Settings)",
         "detection_title": "🔍 การตรวจจับขอบเขต (Detection)",
         "feature_method_label": "อัลกอริทึมสกัดจุดเด่น (Feature Method)",
@@ -373,14 +373,17 @@ if "language" not in st.session_state:
 # Sidebar Controls
 # ─────────────────────────────────────────────────────────
 with st.sidebar:
+    lang_code = st.session_state["language"]
+    t = TRANSLATIONS[lang_code]
+
     # Language Switch Buttons
-    st.markdown("### 🌐 เลือกภาษา / Language")
+    st.markdown(f"### {t['lang_select']}")
     lang_col1, lang_col2 = st.columns(2)
     with lang_col1:
         if st.button(
             "🇹🇭 ภาษาไทย",
             use_container_width=True,
-            type="primary" if st.session_state["language"] == "th" else "secondary",
+            type="primary" if lang_code == "th" else "secondary",
             key="btn_lang_th_side",
         ):
             st.session_state["language"] = "th"
@@ -389,14 +392,11 @@ with st.sidebar:
         if st.button(
             "🇬🇧 English",
             use_container_width=True,
-            type="primary" if st.session_state["language"] == "en" else "secondary",
+            type="primary" if lang_code == "en" else "secondary",
             key="btn_lang_en_side",
         ):
             st.session_state["language"] = "en"
             st.rerun()
-
-    lang_code = st.session_state["language"]
-    t = TRANSLATIONS[lang_code]
 
     st.markdown("---")
     st.markdown(f"## {t['settings_title']}")
@@ -459,29 +459,6 @@ with st.sidebar:
 # ─────────────────────────────────────────────────────────
 # Main Content
 # ─────────────────────────────────────────────────────────
-
-# Top Language Switcher Bar on Main Page
-top_col1, top_col2 = st.columns([3.5, 1.5])
-with top_col2:
-    t_c1, t_c2 = st.columns(2)
-    with t_c1:
-        if st.button(
-            "🇹🇭 ไทย",
-            use_container_width=True,
-            type="primary" if st.session_state["language"] == "th" else "secondary",
-            key="btn_lang_th_top",
-        ):
-            st.session_state["language"] = "th"
-            st.rerun()
-    with t_c2:
-        if st.button(
-            "🇬🇧 EN",
-            use_container_width=True,
-            type="primary" if st.session_state["language"] == "en" else "secondary",
-            key="btn_lang_en_top",
-        ):
-            st.session_state["language"] = "en"
-            st.rerun()
 
 # Header
 st.markdown(f"""
