@@ -5,7 +5,11 @@
 
 ---
 
+<<<<<<< HEAD
 ## ✨ ฟีเจอร์หลัก (Features)
+=======
+## ฟีเจอร์หลัก (Features)
+>>>>>>> 2649ac683ca38aebe8b3d494cb29d769935b9024
 
 - **ตรวจจับขอบเขตเอกสารอัตโนมัติ (Automatic Document Detection)** — ค้นหาขอบกระดาษด้วย Canny Edge Detection และ Contour Polygon Fitting
 - **แก้ไขมุมมองภาพ (Perspective Correction)** — ปรับมุมเอียงของภาพให้ตรงตามสัดส่วนกระดาษ A4 มาตรฐาน หรือตามสัดส่วนจริงของเอกสาร
@@ -21,7 +25,11 @@
 
 ---
 
+<<<<<<< HEAD
 ## 🛠️ สิ่งที่ต้องติดตั้งก่อนเริ่ม (Prerequisites & Installation)
+=======
+## สิ่งที่ต้องติดตั้งก่อนเริ่ม (Prerequisites & Installation)
+>>>>>>> 2649ac683ca38aebe8b3d494cb29d769935b9024
 
 ### 1. โปรแกรมที่ต้องมีในเครื่อง
 - **Python 3.9 - 3.12** (ดาวน์โหลดจาก [python.org](https://www.python.org/downloads/) — *สำหรับ Windows แนะนำให้ติ๊ก **"Add Python to PATH"** ขณะติดตั้ง*)
@@ -70,9 +78,15 @@ pip install -r requirements.txt
 
 ---
 
+<<<<<<< HEAD
 ## 🚀 วิธีการเปิดใช้งานแอปพลิเคชัน (How to Run)
 
 > ⚠️ **หมายเหตุสำคัญ:** หากพิมพ์ `streamlit run app.py` แล้วพบปัญหา `command not found` หรือไม่สามารถเรียกคำสั่งได้ **ให้รันผ่านโมดูลของ Python โดยตรง** ซึ่งเป็นวิธีที่ถูกต้องและแน่นอนที่สุด:
+=======
+## วิธีการเปิดใช้งานแอปพลิเคชัน (How to Run)
+
+> **หมายเหตุสำคัญ:** หากพิมพ์ `streamlit run app.py` แล้วพบปัญหา `command not found` หรือไม่สามารถเรียกคำสั่งได้ **ให้รันผ่านโมดูลของ Python โดยตรง** ซึ่งเป็นวิธีที่ถูกต้องและแน่นอนที่สุด:
+>>>>>>> 2649ac683ca38aebe8b3d494cb29d769935b9024
 
 ```bash
 # วิธีที่ถูกต้องและแนะนำที่สุด:
@@ -84,7 +98,11 @@ python -m streamlit run app.py
 
 ---
 
+<<<<<<< HEAD
 ## 📖 ขั้นตอนการใช้งานบนหน้าเว็บ (Web UI Usage)
+=======
+## ขั้นตอนการใช้งานบนหน้าเว็บ (Web UI Usage)
+>>>>>>> 2649ac683ca38aebe8b3d494cb29d769935b9024
 
 1. **เลือกภาษา (Language):** ที่แถบเมนูด้านซ้าย (Sidebar) สามารถสลับภาษาระหว่าง 🇹🇭 ภาษาไทย หรือ 🇬🇧 English ได้
 2. **อัปโหลดภาพเอกสาร:** ลากและวางไฟล์ภาพถ่ายเอกสารลงในช่องอัปโหลด (รองรับ JPG, PNG, BMP, TIFF, WebP)
@@ -96,7 +114,11 @@ python -m streamlit run app.py
 
 ---
 
+<<<<<<< HEAD
 ## 🧪 วิธีการทดสอบบนเครื่องของตัวเอง (Testing)
+=======
+## วิธีการทดสอบบนเครื่องของตัวเอง (Testing)
+>>>>>>> 2649ac683ca38aebe8b3d494cb29d769935b9024
 
 ### 1. ทดสอบระบบอัตโนมัติ (Automated Pipeline Tests)
 ทดสอบฟังก์ชันสำคัญของระบบ เช่น การหาและจัดเรียงมุม (Corner Ordering), ฟิลเตอร์แต่งภาพทั้งหมด และ Full Scan Pipeline ด้วยคำสั่ง:
@@ -118,4 +140,8 @@ python test_images/generate_sample.py
 python -m streamlit run app.py
 
 # 3. ลากไฟล์ test_images/sample_document.png ไปวางในเว็บเพื่อดูผลการ Rectify และฟิลเตอร์
+<<<<<<< HEAD
 ```
+=======
+```
+>>>>>>> 2649ac683ca38aebe8b3d494cb29d769935b9024
