@@ -25,7 +25,6 @@
 
 ### 1. โปรแกรมที่ต้องมีในเครื่อง
 - **Python 3.9 - 3.12** (ดาวน์โหลดจาก [python.org](https://www.python.org/downloads/) — *สำหรับ Windows แนะนำให้ติ๊ก **"Add Python to PATH"** ขณะติดตั้ง*)
-- **Git** สำหรับดาวน์โหลดโปรเจกต์ ([git-scm.com](https://git-scm.com/))
 
 ---
 
