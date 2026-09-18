@@ -7,11 +7,12 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 เอกสารฉบับนี้ถูกแบ่งออกเป็น **2 ส่วนหลัก (2 Sessions)** อย่างชัดเจน เพื่อความสะดวกในการศึกษาและนำไปใช้งาน:
-1. **[Session 1: รายละเอียดของแอปพลิเคชันและสถาปัตยกรรมทางเทคนิค (App Details & Technical Architecture)](#session-1-รายละเอียดของแอปพลิเคชันและสถาปัตยกรรมทางเทคนิค-app-details--technical-architecture)**
-2. **[Session 2: คู่มือการติดตั้งและวิธีการใช้งาน (User Guide & Step-by-Step Manual)](#session-2-คู่มือการติดตั้งและวิธีการใช้งาน-user-guide--step-by-step-manual)**
+1. **[Session 1: รายละเอียดของแอปพลิเคชันและสถาปัตยกรรมทางเทคนิค](#session-1)**
+2. **[Session 2: คู่มือการติดตั้งและวิธีการใช้งาน](#session-2)**
 
 ---
 
+<a id="session-1"></a>
 # Session 1: รายละเอียดของแอปพลิเคชันและสถาปัตยกรรมทางเทคนิค (App Details & Technical Architecture)
 
 ## 1. ภาพรวมและวัตถุประสงค์ของโครงการ (Project Overview)
@@ -42,63 +43,20 @@
 
 ระบบประมวลผลถูกออกแบบในรูปแบบโมดูลาร์ (Modular Architecture) ภายใต้แพ็กเกจ `scanner` โดยมีโฟลว์การทำงานดังแผนภาพ:
 
-```
-[ Input Document Image ]
-          │
-          ▼
-┌────────────────────────────────────────────────────────┐
-│ 1. Preprocessing Module (scanner.core.preprocessing)   │
-│    - Downscale maintaining Aspect Ratio (Cache scale)  │
-│    - BGR to Grayscale Conversion                       │
-│    - Gaussian Blur (k=5) / Bilateral Filter            │
-│    - Canny Edge Detection (tunable thresholds)         │
-│    - Morphological Dilation (close broken contours)    │
-└────────────────────────────────────────────────────────┘
-          │
-          ▼
-┌────────────────────────────────────────────────────────┐
-│ 2. Corner Detection & Ordering (scanner.core.corner)   │
-│    - Find Contours & Sort by Area descending          │
-│    - Douglas-Peucker Polygon Approximation (approxPolyDP)│
-│    - 4-Corner Convex Polygon Verification              │
-│    - [FALLBACK] Adaptive Threshold / Morph Gradient    │
-│    - Order Points: Top-Left, Top-Right, Bottom-Right,  │
-│      Bottom-Left via (x+y) and (y-x) extremes          │
-└────────────────────────────────────────────────────────┘
-          │
-          ▼
-┌────────────────────────────────────────────────────────┐
-│ 3. Feature Extraction & Homography                     │
-│    (scanner.features.feature_matching)                 │
-│    - SIFT / ORB Keypoint & Descriptor Computation      │
-│    - FLANN / BFMatcher with Lowe's Ratio Test          │
-│    - Compute 3x3 Homography Matrix (cv2.findHomography)│
-│    - Outlier rejection via RANSAC                      │
-└────────────────────────────────────────────────────────┘
-          │
-          ▼
-┌────────────────────────────────────────────────────────┐
-│ 4. Perspective Rectification                           │
-│    (scanner.core.perspective_transform)                │
-│    - Rescale detected corners back to original image   │
-│    - Calculate Euclidean Width & Height                │
-│    - Enforce A4 (1:√2) or preserve True Aspect Ratio   │
-│    - cv2.getPerspectiveTransform + cv2.warpPerspective │
-└────────────────────────────────────────────────────────┘
-          │
-          ▼
-┌────────────────────────────────────────────────────────┐
-│ 5. Image Enhancement & Post-Processing                 │
-│    (scanner.filters.enhancement)                       │
-│    - Clean Grayscale + Unsharp Mask                    │
-│    - Magic Color (HSV Saturation/Value enhancement)    │
-│    - B&W Scanner (Adaptive Gaussian/Mean Thresholding) │
-│    - Shadow Removal (Morphological Illumination Plane) │
-│    - Contrast Limited Adaptive Histogram Equalization  │
-└────────────────────────────────────────────────────────┘
-          │
-          ▼
-[ Final Scanned Document & Step-by-Step Visualization ]
+```mermaid
+flowchart TD
+    A["📷 Input Document Image"] --> B["1. Preprocessing Module<br/>(scanner.core.preprocessing)<br/>• Downscale keeping Aspect Ratio<br/>• Grayscale + Gaussian / Bilateral<br/>• Canny Edge Detection + Dilation"]
+    
+    B --> C["2. Corner Detection & Ordering<br/>(scanner.core.corner_detection)<br/>• Find Contours & Sort by Area<br/>• approxPolyDP (4-Corner Polygon)<br/>• Fallback: Adaptive Thresh / Morph Gradient<br/>• Order Points: TL, TR, BR, BL"]
+    
+    C -->|"พิกัด 4 มุม (Corners)"| D["4. Perspective Rectification<br/>(scanner.core.perspective_transform)<br/>• Rescale points to original image<br/>• Euclidean Width & Height<br/>• Target Ratio: A4 (1:√2) or True Ratio<br/>• Compute Homography H & warpPerspective"]
+    
+    B -.->|"Grayscale Image"| E["3. Feature Analysis & Visualization<br/>(scanner.features.feature_matching)<br/>• SIFT / ORB Keypoint Extraction<br/>• Visual Keypoints Display<br/>• Template Matching & RANSAC (Optional)"]
+    
+    D --> F["5. Image Enhancement & Post-Processing<br/>(scanner.filters.enhancement)<br/>• Clean Grayscale + Unsharp Mask<br/>• Magic Color (HSV Saturation/Value)<br/>• B&W Scanner (Adaptive Threshold)<br/>• Shadow Removal (Illumination plane)<br/>• CLAHE Contrast Enhancement"]
+    
+    F --> G["📄 Final Scanned Document & Step-by-Step UI"]
+    E -.-> G
 ```
 
 ---
@@ -106,13 +64,13 @@
 ## 4. รายละเอียดเชิงลึกของแต่ละโมดูล (Module Deep-Dive)
 
 ### 4.1 Preprocessing Module (`scanner.core.preprocessing.Preprocessor`)
-- **การย่อขนาดภาพ (Resizing):** ทำการปรับขนาดภาพให้อยู่ในขนาดความสูงมาตรฐาน (เช่น 800px) เพื่อให้การตรวจจับเส้นขอบรวดเร็วและคงพารามิเตอร์คงที่ โดยเก็บค่าสเกล `scale = original_height / resized_height` เพื่อนำไปคูณกลับในขั้นตอน Transform
+- **การย่อขนาดภาพ (Resizing):** ปรับขนาดภาพให้อยู่ในความสูงมาตรฐาน (เช่น 800px) เพื่อให้การตรวจจับเส้นขอบรวดเร็วและคงพารามิเตอร์คงที่ โดยเก็บค่าสเกล `scale = original_height / resized_height` เพื่อนำไปคูณกลับในขั้นตอน Transform
 - **Bilateral Filter vs Gaussian Blur:** ให้ตัวเลือก Bilateral Filter ซึ่งช่วยลด Noise บนกระดาษแต่ยังคงความคมชัดของขอบเส้น (Edge-preserving Smoothing)
-- **Morphological Dilation:** ใช้ Dilation ขยายเส้นขอบ Canny ด้วย Structuring Element ขนาด 3x3 หรือ 5x5 เพื่อเชื่อมรอยต่อของเส้นขอบกระดาษที่อาจขาดหายไป
+- **Morphological Dilation:** ขยายเส้นขอบ Canny ด้วย Structuring Element ขนาด 3x3 หรือ 5x5 เพื่อเชื่อมรอยต่อของเส้นขอบกระดาษที่อาจขาดหายไป
 
 ### 4.2 Corner Detection & Ordering (`scanner.core.corner_detection.CornerDetector`)
-- **Polygon Approximation:** ใช้ฟังก์ชัน `cv2.approxPolyDP` คำนวณหาเส้นรอบรูปด้วยหลักการ Douglas-Peucker Algorithm โดยตั้งค่า $\epsilon = 0.02 \times \text{Perimeter}$
-- **Corner Ordering:** เรียงลำดับพิกัด 4 จุดให้อยู่ในลำดับคงที่เสมอ (Top-Left $\to$ Top-Right $\to$ Bottom-Right $\to$ Bottom-Left):
+- **Polygon Approximation:** ใช้ฟังก์ชัน `cv2.approxPolyDP` คำนวณหาเส้นรอบรูปด้วย Douglas-Peucker Algorithm โดยตั้งค่า $\epsilon = 0.02 \times \text{Perimeter}$
+- **Corner Ordering:** จัดเรียงพิกัด 4 จุดให้อยู่ในลำดับคงที่เสมอ (Top-Left $\to$ Top-Right $\to$ Bottom-Right $\to$ Bottom-Left):
   - **Top-Left ($P_{tl}$):** จุดที่มีผลบวก $x + y$ ต่ำที่สุด
   - **Bottom-Right ($P_{br}$):** จุดที่มีผลบวก $x + y$ สูงที่สุด
   - **Top-Right ($P_{tr}$):** จุดที่มีผลต่าง $y - x$ ต่ำที่สุด
@@ -122,26 +80,36 @@
 กรณีที่เอกสารถ่ายบนพื้นหลังที่มีสีใกล้เคียงกัน หรือแสงสะท้อนทำให้ Canny ขาดตอน ระบบจะสลับไปใช้กลยุทธ์สำรองอัตโนมัติ:
 1. **Fallback Method 1 (Adaptive Thresholding Contours):** ทำการ Thresholding แบบปรับตัวตามสภาพแสงเฉพาะที่ เพื่อแยกกระดาษออกจากพื้นหลัง
 2. **Fallback Method 2 (Morphological Gradient & Convex Hull):** ใช้ผลต่างของการ Dilate และ Erode เพื่อหาบริเวณขอบนอกสุด แล้วสร้าง Convex Hull 4 มุม
-3. **Fallback Method 3 (Bounding Box Fallback):** กรณีที่รูปทรงบิดเบี้ยวมาก ระบบจะหา Bounding Quad เพื่อให้แน่ใจว่าไปป์ไลน์สามารถทำงานต่อได้โดยไม่ Error
+3. **Fallback Method 3 (Bounding Box Fallback):** กรณีที่รูปทรงบิดเบี้ยวมาก ระบบจะหา Bounding Quad เพื่อให้แน่ใจว่าไปป์ไลน์สามารถทำงานต่อได้โดยไม่เกิดข้อผิดพลาด
 
 ### 4.4 Feature Matching & Homography Matrix (`scanner.features.feature_matching.FeatureMatcher`)
-- **SIFT (Scale-Invariant Feature Transform):** ทนทานต่อการหมุน (Rotation), การเปลี่ยนขนาด (Scale), และความสว่าง (Illumination) สกัด Local Feature Descriptors ขนาด 128 มิติ
-- **ORB (Oriented FAST and Rotated BRIEF):** ทางเลือกที่ประมวลผลได้รวดเร็ว เหมาะสำหรับอุปกรณ์ที่มีทรัพยากรจำกัด
+- **SIFT (Scale-Invariant Feature Transform):** สกัด Local Feature Descriptors ขนาด 128 มิติ ทนทานต่อการหมุน (Rotation), การเปลี่ยนขนาด (Scale), และความสว่าง (Illumination)
+- **ORB (Oriented FAST and Rotated BRIEF):** อัลกอริทึมทางเลือกที่ประมวลผลได้รวดเร็ว เหมาะสำหรับอุปกรณ์ที่มีทรัพยากรจำกัด
 - **Lowe's Ratio Test:** กรองคู่ Keypoint ที่ดีด้วยเงื่อนไข $d_1 < 0.75 \times d_2$
 - **RANSAC (Random Sample Consensus):** คัดแยก Outliers ที่เกิดจากสิ่งรบกวนบนหน้ากระดาษ และคำนวณ Homography Matrix $3 \times 3$ ที่แท้จริง:
-  $$\begin{bmatrix} x' \\ y' \\ 1 \end{bmatrix} \sim H \begin{bmatrix} x \\ y \\ 1 \end{bmatrix} = \begin{bmatrix} h_{11} & h_{12} & h_{13} \\ h_{21} & h_{22} & h_{23} \\ h_{31} & h_{32} & h_{33} \end{bmatrix} \begin{bmatrix} x \\ y \\ 1 \end{bmatrix}$$
+
+$$P_{\text{target}} \sim H \cdot P_{\text{source}}$$
+
+$$\begin{bmatrix} x' \\ y' \\ 1 \end{bmatrix} \sim \begin{bmatrix} h_{11} & h_{12} & h_{13} \\ h_{21} & h_{22} & h_{23} \\ h_{31} & h_{32} & h_{33} \end{bmatrix} \begin{bmatrix} x \\ y \\ 1 \end{bmatrix}$$
 
 ### 4.5 Perspective Rectification (`scanner.core.perspective_transform.PerspectiveTransformer`)
 - คำนวณความกว้าง ($W$) และความสูง ($H$) จริงของเอกสารจากระยะห่างยูคลิด (Euclidean Distance):
-  $$W = \max\left(\sqrt{(x_{br} - x_{bl})^2 + (y_{br} - y_{bl})^2}, \; \sqrt{(x_{tr} - x_{tl})^2 + (y_{tr} - y_{tl})^2}\right)$$
-  $$H = \max\left(\sqrt{(x_{tr} - x_{br})^2 + (y_{tr} - y_{br})^2}, \; \sqrt{(x_{tl} - x_{bl})^2 + (y_{tl} - y_{bl})^2}\right)$$
-- หากเลือก **Enforce A4 Ratio**: ปรับขนาดโดยคงความกว้าง $W$ และบังคับความสูง $H = W \times \sqrt{2} \approx W \times 1.4142$
-- ทำการ Warp ภาพต้นฉบับความละเอียดสูงด้วย `cv2.warpPerspective`
+
+$$W = \max\left(\sqrt{(x_{br} - x_{bl})^2 + (y_{br} - y_{bl})^2}, \; \sqrt{(x_{tr} - x_{tl})^2 + (y_{tr} - y_{tl})^2}\right)$$
+
+$$H = \max\left(\sqrt{(x_{tr} - x_{br})^2 + (y_{tr} - y_{br})^2}, \; \sqrt{(x_{tl} - x_{bl})^2 + (y_{tl} - y_{bl})^2}\right)$$
+
+- **Enforce A4 Ratio:** หากเปิดใช้งาน จะคงความกว้าง $W$ และปรับความสูงเป็น $H = W \times \sqrt{2} \approx W \times 1.4142$
+- คำนวณ Transformation Matrix ด้วย `cv2.getPerspectiveTransform` และดัดมุมมองภาพความละเอียดสูงด้วย `cv2.warpPerspective`
 
 ### 4.6 Enhancement Filters (`scanner.filters.enhancement.ImageEnhancer`)
 1. **Original:** ภาพผลลัพธ์จากการดัดมุมมองโดยไม่ใส่ฟิลเตอร์
-2. **Clean Grayscale:** แปลงเป็นเฉดสีเทา พร้อมปรับความคมของฟอนต์ตัวหนังสือด้วย Unsharp Sharpening Kernel:
-   $$\begin{bmatrix} 0 & -0.5 & 0 \\ -0.5 & 3.0 & -0.5 \\ 0 & -0.5 & 0 \end{bmatrix}$$
+2. **Clean Grayscale:** แปลงเป็นเฉดสีเทา พร้อมปรับความคมชัดของฟอนต์ตัวหนังสือด้วย Unsharp Sharpening Kernel:
+   ```text
+   [  0.0  -0.5   0.0 ]
+   [ -0.5   3.0  -0.5 ]
+   [  0.0  -0.5   0.0 ]
+   ```
 3. **Magic Color:** แปลงภาพสู่ HSV Color Space ปรับ Saturation $\times 1.5$ และ Value $\times 1.2$ เพื่อให้ตัวหนังสือและภาพประกอบสีมีความสดใสเสมือนเอกสารต้นฉบับ
 4. **B&W Scanner:** แปลงเป็นภาพขาว-ดำ แบบสแกนเนอร์สำนักงาน ด้วย Adaptive Thresholding (Gaussian / Mean) โดยปรับ Block Size และค่าชดเชย $C$ ได้ตามต้องการ
 5. **Shadow Removal:** กำจัดเงาตกกระทบด้วยการประมาณพื้นผิวแสงสว่าง (Illumination Plane Estimation) ผ่าน Morphological Dilation ขนาดใหญ่ร่วมกับ Median Blur แล้วนำภาพต้นฉบับมาลบออกและทำ Normalization
@@ -179,6 +147,7 @@ CP461-Document-Scanner-And-Perspective-Rectifier/
 
 ---
 
+<a id="session-2"></a>
 # Session 2: คู่มือการติดตั้งและวิธีการใช้งาน (User Guide & Step-by-Step Manual)
 
 ## 1. ข้อกำหนดของระบบ (System Requirements)
@@ -225,7 +194,7 @@ cd CP461-Document-Scanner-And-Perspective-Rectifier
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
-*(หากคำสั่ง `pip` หรือ `python` มีปัญหาบน Windows ให้ใช้คำสั่ง `py -m pip install -r requirements.txt`)*
+*(หากคำสั่ง `python` มีปัญหาบน Windows ให้ใช้คำสั่ง `py -m pip install -r requirements.txt` แทน)*
 
 ---
 
@@ -234,10 +203,12 @@ pip install -r requirements.txt
 เพื่อให้มั่นใจว่าระบบจะเรียกใช้ Streamlit ที่ติดตั้งอยู่ในสภาพแวดล้อม Python ที่ถูกต้องอย่างแน่นอน แนะนำให้รันด้วยคำสั่งผ่านโมดูล Python โดยตรง:
 
 ```bash
-# คำสั่งมาตรฐานที่แนะนำที่สุด:
+# คำสั่งสำหรับ Windows (แนะนำ):
+py -m streamlit run app.py
+
+# คำสั่งมาตรฐานทั่วไป (Windows / macOS / Linux):
 python -m streamlit run app.py
 ```
-*(หรือสำหรับ Windows: `py -m streamlit run app.py`)*
 
 เมื่อเริ่มต้นระบบสำเร็จ เบราว์เซอร์จะเปิดหน้าเว็บให้อัตโนมัติที่ URL:
 ```text
@@ -248,7 +219,7 @@ http://localhost:8501
 
 ## 4. คู่มือการใช้งานบน Web UI ทีละขั้นตอน (User Guide)
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  [Sidebar]                           [Main Dashboard]                       │
 │  🌐 เลือกภาษา: 🇹🇭 Thai / 🇬🇧 English     📄 Header & Description               │
@@ -336,11 +307,12 @@ http://localhost:8501
 
 ## 8. การแก้ไขปัญหาที่พบบ่อย (Troubleshooting & FAQs)
 
-- **Q1: รันคำสั่ง `streamlit run app.py` แล้วขึ้นว่า `'streamlit' is not recognized` หรือ `command not found`?**
-  - **วิธีแก้:** ให้รันผ่านตัวเรียก Python เสมอด้วยคำสั่ง:
+- **Q1: รันคำสั่งแล้วขึ้นว่า `python` หรือ `streamlit` not recognized หรือ command not found?**
+  - **วิธีแก้:** สำหรับ Windows ให้ใช้ Python Launcher รันด้วยคำสั่ง:
     ```bash
-    python -m streamlit run app.py
+    py -m streamlit run app.py
     ```
+    หรือหากอยู่ใน Virtual Environment ให้ตรวจสอบว่าได้ Activate สภาพแวดล้อมแล้วหรือไม่ (`.\venv\Scripts\activate`)
 - **Q2: ระบบตรวจจับขอบกระดาษผิด หรือตรวจจับไปโดนกรอบโต๊ะแทน?**
   - **วิธีแก้:** เลื่อนปรับแถบ **Canny Low Threshold** หรือ **Canny High Threshold** บน Sidebar เพื่อให้ระบบจับเฉพาะเส้นขอบกระดาษที่ชัดเจน หรือเลือกเปลี่ยนรูปภาพที่มีพื้นหลังตัดกับกระดาษมากขึ้น
 - **Q3: ภาพสแกนเอกสารยาว (เช่น สลิป 7-Eleven) ออกมาแล้วหดสั้นหรือสัดส่วนเพี้ยน?**
