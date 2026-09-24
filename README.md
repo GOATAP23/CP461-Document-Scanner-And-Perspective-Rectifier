@@ -5,6 +5,7 @@
 [![OpenCV](https://img.shields.io/badge/OpenCV-4.8+-green.svg)](https://opencv.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)](https://streamlit.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Streamlit_Cloud-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://cp461-document-scanner-and-perspective-rectifier-tryxb6akpbhvu.streamlit.app/)
 
 เอกสารฉบับนี้ถูกแบ่งออกเป็น **2 ส่วนหลัก (2 Sessions)** อย่างชัดเจน เพื่อความสะดวกในการศึกษาและนำไปใช้งาน:
 1. **[Session 1: รายละเอียดของแอปพลิเคชันและสถาปัตยกรรมทางเทคนิค](#session-1)**
@@ -150,6 +151,23 @@ CP461-Document-Scanner-And-Perspective-Rectifier/
 <a id="session-2"></a>
 # Session 2: คู่มือการติดตั้งและวิธีการใช้งาน (User Guide & Step-by-Step Manual)
 
+## 0. ทดลองใช้งานออนไลน์ (Live Demo — No Installation Required)
+
+> **แอปพลิเคชันถูก Deploy บน Streamlit Community Cloud แล้ว** ไม่ต้องติดตั้งอะไรเพิ่มเติม สามารถทดลองใช้งานได้ทันที:
+
+🚀 **[https://cp461-document-scanner-and-perspective-rectifier-tryxb6akpbhvu.streamlit.app/](https://cp461-document-scanner-and-perspective-rectifier-tryxb6akpbhvu.streamlit.app/)**
+
+| รายละเอียด | ข้อมูล |
+|---|---|
+| **Platform** | Streamlit Community Cloud |
+| **URL** | https://cp461-document-scanner-and-perspective-rectifier-tryxb6akpbhvu.streamlit.app/ |
+| **ความพร้อมใช้งาน** | ออนไลน์ตลอดเวลา (Public Access) |
+| **ข้อจำกัด** | ทรัพยากรจำกัดตาม Free Tier — หากแอปหยุดนิ่ง กด **"Wake up app"** เพื่อเริ่มใหม่ |
+
+> *หากต้องการรันบนเครื่องของตัวเองเพื่อประสิทธิภาพสูงสุด ให้ทำตามขั้นตอนด้านล่าง*
+
+---
+
 ## 1. ข้อกำหนดของระบบ (System Requirements)
 - **ระบบปฏิบัติการ:** Windows 10/11, macOS (Intel / Apple Silicon), หรือ Linux (Ubuntu 20.04+)
 - **Python:** เวอร์ชัน **3.9 ถึง 3.12** (ดาวน์โหลดจาก [python.org](https://www.python.org/downloads/))
@@ -222,19 +240,21 @@ http://localhost:8501
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  [Sidebar]                           [Main Dashboard]                       │
-│  🌐 เลือกภาษา: 🇹🇭 Thai / 🇬🇧 English     📄 Header & Description               │
+│  🌐 เลือกภาษา: 🇹🇭 Thai / 🇬🇧 English     📄 Glassmorphic App Header              │
 │                                      ┌───────────────────────────────────┐  │
 │  ⚙️ Scanner Settings:                 │ 📤 Drag and Drop Image File       │  │
 │    • SIFT / ORB                      └───────────────────────────────────┘  │
 │    • Enforce A4 Ratio [✓]                                                   │
-│    • Canny / Blur Sliders            📊 Stat Cards: Detection | Pts | Size  │
-│    • Filter: B&W / Magic / Shadow                                           │
-│                                      🖼️ 3-Column Comparative View:          │
-│                                      [Original]  [Rectified]  [Enhanced]    │
-│                                      [       ⬇️ Download Scanned PNG      ]  │
+│    • Canny / Blur Sliders            📊 Stat Cards (4 ช่อง):                │
+│    • Filter: B&W / Magic / Shadow         Method | Keypoints | Size | Algo  │
 │                                                                             │
-│                                      🔬 Step-by-Step Pipeline Dropdowns     │
-│                                      🎨 All Filter Previews Grid            │
+│                                      🖼️ 2-Column Comparative View:          │
+│                                      [Original] │ [Enhanced + Filter Label] │
+│                                                 │ [⬇️ Download Scanned PNG]  │
+│                                                                             │
+│                                      🔬 Pipeline Inspection (Steps 1 – 4)   │
+│                                      🎨 Enhancement Filter Gallery (6 ฟิลเตอร์)│
+│                                      📋 Pipeline Execution Summary Log      │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
