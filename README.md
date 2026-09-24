@@ -155,7 +155,7 @@ CP461-Document-Scanner-And-Perspective-Rectifier/
 
 > **แอปพลิเคชันถูก Deploy บน Streamlit Community Cloud แล้ว** ไม่ต้องติดตั้งอะไรเพิ่มเติม สามารถทดลองใช้งานได้ทันที:
 
-🚀 **[https://cp461-document-scanner-and-perspective-rectifier-tryxb6akpbhvu.streamlit.app/](https://cp461-document-scanner-and-perspective-rectifier-tryxb6akpbhvu.streamlit.app/)**
+**[https://cp461-document-scanner-and-perspective-rectifier-tryxb6akpbhvu.streamlit.app/](https://cp461-document-scanner-and-perspective-rectifier-tryxb6akpbhvu.streamlit.app/)**
 
 | รายละเอียด | ข้อมูล |
 |---|---|
