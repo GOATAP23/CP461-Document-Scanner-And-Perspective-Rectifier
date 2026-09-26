@@ -7,6 +7,14 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Streamlit_Cloud-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://cp461-document-scanner-and-perspective-rectifier-tryxb6akpbhvu.streamlit.app/)
 
+# สมาชิกกลุ่ม (กลุ่มที่ 9)
+นายพิชิตพงศ์ ชนะดี 67102010168
+นางสาววริศรา ดิลกกาญจนมาลย์ 67102010173
+นายวัชรพงศ์ มาลัง 67102010174
+นายสิรภพ บุญโกสุมภ์ 67102010175
+นายอนันฌานนทน์ แป้นสุวรรณ 67102010176 
+นายอภิรักษ์ ม่วงสุขำ 67102010179
+
 เอกสารฉบับนี้ถูกแบ่งออกเป็น **2 ส่วนหลัก (2 Sessions)** อย่างชัดเจน เพื่อความสะดวกในการศึกษาและนำไปใช้งาน:
 1. **[Session 1: รายละเอียดของแอปพลิเคชันและสถาปัตยกรรมทางเทคนิค](#session-1)**
 2. **[Session 2: คู่มือการติดตั้งและวิธีการใช้งาน](#session-2)**
